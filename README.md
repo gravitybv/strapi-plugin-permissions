@@ -10,14 +10,27 @@
 
 ## Usage
 
-The plugin will automatically create a file in the `config/` directory of your Strapi installation.
-This file is named `config/permissions.js` and will contain default permissions upon first install.
+Enable in `config/plugins.js`:
+
+```json
+{
+  "permissions": {
+    "enabled": true,
+    "resolve": "@gravitybv/strapi-plugin-permissions"
+  }
+}
+```
+
+The plugin will automatically create a file in the `config/` directory of your Strapi installation. This newly created file is named `config/permissions.js` and will contain default permissions upon first install.
 
 The permissions in this file will automatically be set upon Strapi bootstrap.
 
-### Naming
+#### Naming
 
-Please use the prefix `plugin::` to target a specific plugin. Use `api::` to target one of your own controllers.
+Please use the prefix `plugin::` to target a specific plugin.
+
+Use `api::` to target one of your own controllers.
+
 When only specifying the prefix and entity name, without targeting a controller (e.g. `api::restaurant` or `plugin::users-permissions`), the plugin will set the permissions for all of the controllers in that entity.
 To target a specific controller, please use: `api::restaurant.restaurant`, or `plugin::users-permissions.auth`.
 
