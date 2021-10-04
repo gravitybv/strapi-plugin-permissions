@@ -6,7 +6,7 @@
 
 ## Installation
 
-1. Install using `npm install strapi-plugin-permissions`
+1. Install using `npm install @gravitybv/strapi-plugin-permissions` in the root of your Strapi project.
 
 ## Usage
 
