@@ -23,5 +23,12 @@
   "homepage": "https://github.com/gravitybv/strapi-plugin-permissions#readme",
   "dependencies": {
     "lodash": "^4"
+  },
+  "strapi": {
+    "name": "permissions",
+    "displayName": "Roles & Permissions (Configuration file)",
+    "description": "Configure the 'Roles & Permissions' plugin using a configuration file in the 'config/' folder.",
+    "required": true,
+    "kind": "plugin"
   }
 }
