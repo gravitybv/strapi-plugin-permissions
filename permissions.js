@@ -27,10 +27,25 @@ class Permissions {
 
     strapi.log.info("[Permissions] 🚀 Setting up permissions...");
 
-    const roles = await strapi
+    let roles = await strapi
       .plugin("users-permissions")
       .service("role")
       .getRoles();
+
+    // Add roles that are set in config but not in strapi
+    for(const configRole of Object.keys(strapi.config.permissions)){
+      if(roles.find((role) => role.type == configRole)) {
+        continue
+      }
+      const roleToAdd = {name: _.upperFirst(configRole), description: strapi.config.permissions[configRole].description}
+      await strapi.plugin("users-permissions").service("role").createRole(roleToAdd)
+    }
+
+    roles = await strapi
+    .plugin("users-permissions")
+    .service("role")
+    .getRoles();
+
     for (let role of roles) {
       if (!role || role.id === null) {
         continue;
@@ -41,6 +56,7 @@ class Permissions {
         .service("role")
         .getRole(role.id, []);
 
+      // Disable all current permissions
       const existingPermissionKeys = Object.keys(role.permissions);
       for (const permissionKey of existingPermissionKeys) {
         const controllers = _.values(
@@ -60,7 +76,8 @@ class Permissions {
         continue;
       }
 
-      const permissionKeys = Object.keys(permissionConfig);
+      const permissionKeys = Object.keys(permissionConfig.permissions);
+
       for (const permissionKey of permissionKeys) {
         const keyParts = permissionKey.split(".");
         const key = _.head(keyParts) || permissionKey;
@@ -86,7 +103,7 @@ class Permissions {
         }
 
         for (const controller of controllers) {
-          for (const permission of permissionConfig[permissionKey]) {
+          for (const permission of permissionConfig.permissions[permissionKey]) {
             if (_.has(controller, permission)) {
               _.set(controller, `${permission}.enabled`, true);
             } else {
