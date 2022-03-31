@@ -37,7 +37,11 @@ class Permissions {
       if(roles.find((role) => role.type == configRole)) {
         continue
       }
-      const roleToAdd = {name: _.upperFirst(configRole), description: strapi.config.permissions[configRole].description}
+      let description = _.upperFirst(configRole)
+      if(strapi.config.permissions[configRole].description){
+        description = strapi.config.permissions[configRole].description
+      }
+      const roleToAdd = {name: _.upperFirst(configRole), description: description}
       await strapi.plugin("users-permissions").service("role").createRole(roleToAdd)
     }
 
@@ -70,13 +74,21 @@ class Permissions {
         }
       }
 
-      const permissionConfig =
-        _.get(strapi.config.permissions, role.type, null) || null;
+      const configRole = _.get(strapi.config.permissions, role.type, null);
+
+      let permissionConfig
+      if(configRole?.permissions){
+        permissionConfig = configRole.permissions
+      }
+      else{
+        permissionConfig = configRole
+      }
+
       if (!permissionConfig) {
         continue;
       }
 
-      const permissionKeys = Object.keys(permissionConfig.permissions);
+      const permissionKeys = Object.keys(permissionConfig);
 
       for (const permissionKey of permissionKeys) {
         const keyParts = permissionKey.split(".");
@@ -103,7 +115,7 @@ class Permissions {
         }
 
         for (const controller of controllers) {
-          for (const permission of permissionConfig.permissions[permissionKey]) {
+          for (const permission of permissionConfig[permissionKey]) {
             if (_.has(controller, permission)) {
               _.set(controller, `${permission}.enabled`, true);
             } else {
