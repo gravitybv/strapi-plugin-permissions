@@ -4,6 +4,9 @@ on:
   push:
     tags: v*.*.*
 
+  workflow_dispatch:
+    inputs:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,3 +25,8 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Publish package to github packages
+        run: npm publish --access public --@gravitybv:registry=https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
