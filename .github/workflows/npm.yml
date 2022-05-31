@@ -1,4 +1,4 @@
-name: Publish to Github actions / NPM
+name: Publish to NPM
 
 on:
   push:
@@ -13,18 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
+          node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install npm dependencies
         run: npm install
-
-      - name: Publish package to github packages
-        run: npm publish --access public --@gravitybv:registry=https://npm.pkg.github.com/gravitybv
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Publish package to npm
         run: npm publish --access public
