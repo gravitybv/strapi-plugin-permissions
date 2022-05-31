@@ -1,6 +1,6 @@
 {
   "name": "@gravitybv/strapi-plugin-permissions",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Strapi plugin that handles permissions through a config file.",
   "main": "strapi-server.js",
   "scripts": {
