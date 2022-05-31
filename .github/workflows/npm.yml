@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Publish package to github packages
-        run: npm publish --access public --@gravitybv:registry=https://npm.pkg.github.com
+        run: npm publish --access public --@gravitybv:registry=https://npm.pkg.github.com/gravitybv
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
