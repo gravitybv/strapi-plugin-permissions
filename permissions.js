@@ -27,28 +27,27 @@ class Permissions {
 
     strapi.log.info("[Permissions] 🚀 Setting up permissions...");
 
-    let roles = await strapi
-      .plugin("users-permissions")
-      .service("role")
-      .getRoles();
+    let roles = await strapi.service("plugin::users-permissions.role").find();
 
     // Add roles that are set in config but not in strapi
-    for(const configRole of Object.keys(strapi.config.permissions)){
-      if(roles.find((role) => role.type == configRole)) {
-        continue
+    for (const configRole of Object.keys(strapi.config.permissions)) {
+      if (roles.find((role) => role.type == configRole)) {
+        continue;
       }
-      let description = _.upperFirst(configRole)
-      if(strapi.config.permissions[configRole].description){
-        description = strapi.config.permissions[configRole].description
+      let description = _.upperFirst(configRole);
+      if (strapi.config.permissions[configRole].description) {
+        description = strapi.config.permissions[configRole].description;
       }
-      const roleToAdd = {name: _.upperFirst(configRole), description: description}
-      await strapi.plugin("users-permissions").service("role").createRole(roleToAdd)
+      const roleToAdd = {
+        name: _.upperFirst(configRole),
+        description: description,
+      };
+      await strapi
+        .service("plugin::users-permissions.role")
+        .createRole(roleToAdd);
     }
 
-    roles = await strapi
-    .plugin("users-permissions")
-    .service("role")
-    .getRoles();
+    roles = await strapi.service("plugin::users-permissions.role").find();
 
     for (let role of roles) {
       if (!role || role.id === null) {
@@ -56,9 +55,8 @@ class Permissions {
       }
 
       role = await strapi
-        .plugin("users-permissions")
-        .service("role")
-        .getRole(role.id, []);
+        .service("plugin::users-permissions.role")
+        .findOne(role.id, []);
 
       // Disable all current permissions
       const existingPermissionKeys = Object.keys(role.permissions);
@@ -76,12 +74,11 @@ class Permissions {
 
       const configRole = _.get(strapi.config.permissions, role.type, null);
 
-      let permissionConfig
-      if(configRole?.permissions){
-        permissionConfig = configRole.permissions
-      }
-      else{
-        permissionConfig = configRole
+      let permissionConfig;
+      if (configRole?.permissions) {
+        permissionConfig = configRole.permissions;
+      } else {
+        permissionConfig = configRole;
       }
 
       if (!permissionConfig) {
@@ -128,8 +125,7 @@ class Permissions {
       }
 
       await strapi
-        .plugin("users-permissions")
-        .service("role")
+        .service("plugin::users-permissions.role")
         .updateRole(role.id, role);
     }
 
