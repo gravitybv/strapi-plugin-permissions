@@ -27,7 +27,7 @@ class Permissions {
 
     strapi.log.info("[Permissions] 🚀 Setting up permissions...");
 
-    let roles = await strapi.service("plugin::users-permissions.role").find();
+    let roles = await strapi.service("plugin::users-permissions.role").getRoles();
 
     // Add roles that are set in config but not in strapi
     for (const configRole of Object.keys(strapi.config.permissions)) {
@@ -47,7 +47,7 @@ class Permissions {
         .createRole(roleToAdd);
     }
 
-    roles = await strapi.service("plugin::users-permissions.role").find();
+    roles = await strapi.service("plugin::users-permissions.role").getRoles();
 
     for (let role of roles) {
       if (!role || role.id === null) {
@@ -56,7 +56,7 @@ class Permissions {
 
       role = await strapi
         .service("plugin::users-permissions.role")
-        .findOne(role.id, []);
+        .getRole(role.id);
 
       // Disable all current permissions
       const existingPermissionKeys = Object.keys(role.permissions);
