@@ -137,9 +137,9 @@ class Permissions {
   }
 
   async createPermissionsFile(typescript = false) {
-    const targetFilename = `${strapi.dirs.config}/permissions.${
-      typescript ? "ts" : "js"
-    }`;
+    const targetFilename = `${
+      strapi.dirs.config || strapi.dirs.app.config
+    }/permissions.${typescript ? "ts" : "js"}`;
 
     try {
       await fs.stat(targetFilename);
