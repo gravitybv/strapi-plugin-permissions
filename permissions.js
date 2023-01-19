@@ -12,14 +12,18 @@ class Permissions {
       return;
     }
 
+    const pluginConfig = strapi.config.get("plugin.permissions");
+
     if (!strapi.config.permissions) {
       strapi.log.info("[Permissions] 🚀 Creating permissions file...");
-      await this.createPermissionsFile();
+      await this.createPermissionsFile(pluginConfig.typescript);
 
       // Strapi is now auto restarting... if not, schedule a 'kill'
       setTimeout(() => {
         strapi.log.info(
-          "[Permissions] 🚀 Created config/permissions.js. Please restart Strapi manually."
+          `[Permissions] 🚀 Created config/permissions.${
+            pluginConfig.typescript ? "ts" : "js"
+          }. Please restart Strapi manually.`
         );
         process.exit(1);
       }, 200);
@@ -132,8 +136,10 @@ class Permissions {
     strapi.log.info("[Permissions] 🚀 All permissions set.");
   }
 
-  async createPermissionsFile() {
-    const targetFilename = `${strapi.dirs.config}/permissions.js`;
+  async createPermissionsFile(typescript = false) {
+    const targetFilename = `${strapi.dirs.config}/permissions.${
+      typescript ? "ts" : "js"
+    }`;
 
     try {
       await fs.stat(targetFilename);
@@ -142,7 +148,10 @@ class Permissions {
         return;
       }
 
-      await fs.copyFile(`${__dirname}/default-config.js`, targetFilename);
+      await fs.copyFile(
+        `${__dirname}/default-config.${typescript ? "ts" : "js"}`,
+        targetFilename
+      );
     }
   }
 }
