@@ -15,8 +15,7 @@ Enable in `config/plugins.js`:
 ```json
 {
   "permissions": {
-    "enabled": true,
-    "resolve": "@gravitybv/strapi-plugin-permissions"
+    "enabled": true
   }
 }
 ```
@@ -33,6 +32,23 @@ Use `api::` to target one of your own controllers.
 
 When only specifying the prefix and entity name, without targeting a controller (e.g. `api::restaurant` or `plugin::users-permissions`), the plugin will set the permissions for all of the controllers in that entity.
 To target a specific controller, please use: `api::restaurant.restaurant`, or `plugin::users-permissions.auth`.
+
+### Typescript
+
+When using in a typescript project add a config to the plugin config:
+
+`config/plugins.js`
+
+```json
+{
+  "permissions": {
+    "enabled": true,
+    "config": {
+      "typescript": true
+    }
+  }
+}
+```
 
 ## License
 
