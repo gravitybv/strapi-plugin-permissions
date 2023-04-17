@@ -3,6 +3,10 @@
 const _ = require("lodash");
 const fs = require("fs").promises;
 
+const convertRoleNameToRoleType = (roleName) => {
+  return _.snakeCase(_.deburr(_.toLower(roleName)));
+};
+
 class Permissions {
   async setup() {
     if (!strapi.isLoaded) {
@@ -35,7 +39,9 @@ class Permissions {
 
     // Add roles that are set in config but not in strapi
     for (const configRole of Object.keys(strapi.config.permissions)) {
-      if (roles.find((role) => role.type == configRole)) {
+      if (
+        roles.find((role) => role.type == convertRoleNameToRoleType(configRole))
+      ) {
         continue;
       }
       let description = _.upperFirst(configRole);
@@ -76,7 +82,10 @@ class Permissions {
         }
       }
 
-      const configRole = _.get(strapi.config.permissions, role.type, null);
+      const configKey = Object.keys(strapi.config.permissions).find(
+        (key) => convertRoleNameToRoleType(key) === role.type
+      );
+      const configRole = strapi.config.permissions?.[configKey];
 
       let permissionConfig;
       if (configRole?.permissions) {
