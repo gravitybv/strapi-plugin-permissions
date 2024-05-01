@@ -4,9 +4,21 @@
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![License][license-src]][license-href]
 
+This plugin is to have persistent permissions in different environments regarding api interaction.
+
 ## Installation
 
 1. Install using `npm install @gravitybv/strapi-plugin-permissions` in the root of your Strapi project.
+
+### No access to @gravitybv?
+
+If you dont have access to the `@gravitybv` scope you need to do the following:
+
+1. First you will need a [personal access token (PAT)](https://github.com/settings/tokens)
+2. Create a toke with `repo` and `read:packages` scopes selected. Make sure to store this somehwere
+3. Run `npm login --registry=https://npm.pkg.github.com --scope=gravitybv`
+4. Login with your github username and use the PAT as password
+5. Now you should be able to install this package in other projects
 
 ## Usage
 
@@ -14,9 +26,9 @@ Enable in `config/plugins.js`:
 
 ```json
 {
-  "permissions": {
-    "enabled": true
-  }
+	"permissions": {
+		"enabled": true
+	}
 }
 ```
 
@@ -41,12 +53,12 @@ When using in a typescript project add a config to the plugin config:
 
 ```json
 {
-  "permissions": {
-    "enabled": true,
-    "config": {
-      "typescript": true
-    }
-  }
+	"permissions": {
+		"enabled": true,
+		"config": {
+			"typescript": true
+		}
+	}
 }
 ```
 
