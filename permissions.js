@@ -29,8 +29,6 @@ class Permissions {
         }, INITIAL_DELAY);
       });
     }
-    
-    strapi.log.info("[Permissions] 🔄 Starting permissions setup...");
 
     if (!strapi.config.permissions) {
       strapi.log.info("[Permissions] 🚀 Creating permissions file...");
@@ -120,11 +118,6 @@ class Permissions {
         const moduleParts = permissionKey.split("::");
         const moduleName = _.last(moduleParts) || permissionKey;
 
-        strapi.log.debug(`[Permissions] Processing key: ${permissionKey}`);
-        strapi.log.debug(`[Permissions]   - keyParts: ${JSON.stringify(keyParts)}`);
-        strapi.log.debug(`[Permissions]   - key: ${key}`);
-        strapi.log.debug(`[Permissions]   - moduleName: ${moduleName}`);
-
         const targetControllers =
           _.get(role.permissions[key], "controllers", null) || null;
         if (!targetControllers) {
@@ -175,7 +168,7 @@ class Permissions {
           for (const permission of permissionConfig[permissionKey]) {
             if (_.has(controller, permission)) {
               _.set(controller, `${permission}.enabled`, true);
-              strapi.log.info(
+              strapi.log.debug(
                 `[Permissions]   ✅ Enabled '${permission}' for '${permissionKey}'`
               );
             } else {
