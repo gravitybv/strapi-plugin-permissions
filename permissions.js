@@ -9,7 +9,7 @@ const convertRoleNameToRoleType = (roleName) => {
 
 class Permissions {
   async setup(retries = 0) {
-    const MAX_RETRIES = 5;
+    const MAX_RETRIES = 50; // Max 10 seconds (50 * 200ms)
     
     if (!strapi.isLoaded) {
       if (retries >= MAX_RETRIES) {
@@ -120,31 +120,67 @@ class Permissions {
         const moduleParts = permissionKey.split("::");
         const moduleName = _.last(moduleParts) || permissionKey;
 
+        strapi.log.debug(`[Permissions] Processing key: ${permissionKey}`);
+        strapi.log.debug(`[Permissions]   - keyParts: ${JSON.stringify(keyParts)}`);
+        strapi.log.debug(`[Permissions]   - key: ${key}`);
+        strapi.log.debug(`[Permissions]   - moduleName: ${moduleName}`);
+
         const targetControllers =
           _.get(role.permissions[key], "controllers", null) || null;
         if (!targetControllers) {
           strapi.log.error(
             `[Permissions] Controller '${key}' not found! Skipping...`
           );
+          strapi.log.debug(
+            `[Permissions]   Available keys in role.permissions: ${JSON.stringify(Object.keys(role.permissions))}`
+          );
           continue;
         }
 
+        strapi.log.debug(
+          `[Permissions]   - Available controllers: ${JSON.stringify(Object.keys(targetControllers))}`
+        );
+
         const controllers = [];
         if (keyParts.length > 1) {
-          controllers.push(targetControllers[keyParts[1]]);
+          strapi.log.debug(`[Permissions]   - Using keyParts[1]: ${keyParts[1]}`);
+          const controller = targetControllers[keyParts[1]];
+          if (controller) {
+            controllers.push(controller);
+          } else {
+            strapi.log.warn(
+              `[Permissions]   - Controller '${keyParts[1]}' not found in targetControllers!`
+            );
+          }
         } else if (_.has(targetControllers, moduleName)) {
+          strapi.log.debug(`[Permissions]   - Using moduleName: ${moduleName}`);
           controllers.push(targetControllers[moduleName]);
         } else {
+          strapi.log.debug(`[Permissions]   - Using all controllers`);
           controllers.push(targetControllers);
         }
 
         for (const controller of controllers) {
+          if (!controller) {
+            strapi.log.warn(
+              `[Permissions]   - Controller is null/undefined for '${permissionKey}', skipping...`
+            );
+            continue;
+          }
+
+          strapi.log.debug(
+            `[Permissions]   - Controller actions: ${JSON.stringify(Object.keys(controller))}`
+          );
+
           for (const permission of permissionConfig[permissionKey]) {
             if (_.has(controller, permission)) {
               _.set(controller, `${permission}.enabled`, true);
+              strapi.log.info(
+                `[Permissions]   ✅ Enabled '${permission}' for '${permissionKey}'`
+              );
             } else {
               strapi.log.error(
-                `[Permissions] Permission '${permission}' not found for '${permissionKey}'. Skipping...`
+                `[Permissions]   ❌ Permission '${permission}' not found for '${permissionKey}'. Available: ${JSON.stringify(Object.keys(controller))}`
               );
             }
           }
@@ -156,7 +192,7 @@ class Permissions {
         .updateRole(role.id, role);
     }
 
-    strapi.log.info("[Permissions] 🚀 All permissions set.");
+    strapi.log.info("[Permissions] 🚀 All permissions set!");
   }
 
   async createPermissionsFile(typescript = false) {
