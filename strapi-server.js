@@ -10,6 +10,6 @@ module.exports = {
     }
     
     const permissions = new Permissions(strapi);
-    permissions.setup();
+    return permissions.setup();
   }
 };

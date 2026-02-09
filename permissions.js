@@ -8,13 +8,27 @@ const convertRoleNameToRoleType = (roleName) => {
 };
 
 class Permissions {
-  async setup() {
+  async setup(retries = 0) {
+    const MAX_RETRIES = 5;
+    
     if (!strapi.isLoaded) {
-      setTimeout(() => {
-        this.setup();
-      }, 200);
-      return;
+      if (retries >= MAX_RETRIES) {
+        strapi.log.error(
+          `[Permissions] ❌ Timeout: Strapi not loaded after ${(MAX_RETRIES * 200) / 1000}s. Permissions not set!`
+        );
+        return;
+      }
+      
+      // Wait 200ms and retry
+      return new Promise((resolve) => {
+        setTimeout(async () => {
+          await this.setup(retries + 1);
+          resolve();
+        }, 200);
+      });
     }
+    
+    strapi.log.info("[Permissions] 🔄 Starting permissions setup...");
 
     const pluginConfig = strapi.config.get("plugin.permissions");
 
