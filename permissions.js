@@ -9,28 +9,28 @@ const convertRoleNameToRoleType = (roleName) => {
 
 class Permissions {
   async setup(retries = 0) {
-    const MAX_RETRIES = 50; // Max 10 seconds (50 * 200ms)
+    const pluginConfig = strapi.config.get("plugin.permissions");
+    const MAX_RETRIES = pluginConfig?.maxRetries ?? 50;
+    const INITIAL_DELAY = pluginConfig?.initialDelay ?? 200;
     
     if (!strapi.isLoaded) {
       if (retries >= MAX_RETRIES) {
         strapi.log.error(
-          `[Permissions] ❌ Timeout: Strapi not loaded after ${(MAX_RETRIES * 200) / 1000}s. Permissions not set!`
+          `[Permissions] ❌ Timeout: Strapi not loaded after ${(MAX_RETRIES * INITIAL_DELAY) / 1000}s. Permissions not set!`
         );
         return;
       }
       
-      // Wait 200ms and retry
+      // Wait and retry
       return new Promise((resolve) => {
         setTimeout(async () => {
           await this.setup(retries + 1);
           resolve();
-        }, 200);
+        }, INITIAL_DELAY);
       });
     }
     
     strapi.log.info("[Permissions] 🔄 Starting permissions setup...");
-
-    const pluginConfig = strapi.config.get("plugin.permissions");
 
     if (!strapi.config.permissions) {
       strapi.log.info("[Permissions] 🚀 Creating permissions file...");

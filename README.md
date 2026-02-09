@@ -45,7 +45,9 @@ Use `api::` to target one of your own controllers.
 When only specifying the prefix and entity name, without targeting a controller (e.g. `api::restaurant` or `plugin::users-permissions`), the plugin will set the permissions for all of the controllers in that entity.
 To target a specific controller, please use: `api::restaurant.restaurant`, or `plugin::users-permissions.auth`.
 
-### Typescript
+### Configuration
+
+#### Typescript
 
 When using in a typescript project add a config to the plugin config:
 
@@ -61,6 +63,29 @@ When using in a typescript project add a config to the plugin config:
 	}
 }
 ```
+
+#### Advanced Options
+
+You can configure the retry behavior when waiting for Strapi to load:
+
+`config/plugins.js`
+
+```json
+{
+	"permissions": {
+		"enabled": true,
+		"config": {
+			"maxRetries": 50,
+			"initialDelay": 200
+		}
+	}
+}
+```
+
+- **maxRetries** (default: `50`): Maximum number of retry attempts before timing out
+- **initialDelay** (default: `200`): Delay in milliseconds between retry attempts
+
+The default configuration allows for a total wait time of 10 seconds (50 retries × 200ms)
 
 ## License
 
